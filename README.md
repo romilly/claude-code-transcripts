@@ -26,10 +26,9 @@ uvx claude-code-transcripts --help
 
 This tool converts Claude Code session files into browseable multi-page HTML transcripts.
 
-There are four commands available:
+There are three commands available:
 
 - `local` (default) - select from local Claude Code sessions stored in `~/.claude/projects`
-- `web` - select from web sessions via the Claude API
 - `json` - convert a specific JSON or JSONL session file
 - `all` - convert all local sessions to a browsable HTML archive
 
@@ -72,30 +71,12 @@ Use `--limit` to control how many sessions are shown (default: 10):
 claude-code-transcripts local --limit 20
 ```
 
-### Web sessions
-
-Import sessions directly from the Claude API:
-
-```bash
-# Interactive session picker
-claude-code-transcripts web
-
-# Import a specific session by ID
-claude-code-transcripts web SESSION_ID
-
-# Import and publish to gist
-claude-code-transcripts web SESSION_ID --gist
-```
-
-On macOS, API credentials are automatically retrieved from your keychain (requires being logged into Claude Code). On other platforms, provide `--token` and `--org-uuid` manually.
-
 ### Publishing to GitHub Gist
 
 Use the `--gist` option to automatically upload your transcript to a GitHub Gist and get a shareable preview URL:
 
 ```bash
 claude-code-transcripts --gist
-claude-code-transcripts web --gist
 claude-code-transcripts json session.json --gist
 ```
 
@@ -121,11 +102,11 @@ claude-code-transcripts json session.json -o ./my-transcript --gist
 Use `-a/--output-auto` to automatically create a subdirectory named after the session:
 
 ```bash
-# Creates ./session_ABC123/ subdirectory
-claude-code-transcripts web SESSION_ABC123 -a
+# Creates ./my-session/ subdirectory
+claude-code-transcripts json my-session.jsonl -a
 
-# Creates ./transcripts/session_ABC123/ subdirectory
-claude-code-transcripts web SESSION_ABC123 -o ./transcripts -a
+# Creates ./transcripts/my-session/ subdirectory
+claude-code-transcripts json my-session.jsonl -o ./transcripts -a
 ```
 
 ### Including the source file
@@ -151,7 +132,7 @@ Convert a specific session file directly:
 claude-code-transcripts json session.json -o output-directory/
 claude-code-transcripts json session.jsonl --open
 ```
-This works with both JSONL files in the `~/.claude/projects/` folder and JSON session files extracted from Claude Code for web.
+This works with JSONL files in the `~/.claude/projects/` folder.
 
 The `json` command can take a URL to a JSON or JSONL file as an alternative to a path on disk.
 
