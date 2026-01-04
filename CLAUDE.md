@@ -30,13 +30,12 @@ The package converts Claude Code session files (JSON/JSONL) to paginated HTML tr
 
 ### Module Structure
 
-- `__init__.py` - CLI commands (local, web, json, all) using Click, plus public API re-exports
+- `__init__.py` - CLI commands (local, json, all) using Click, plus public API re-exports
 - `html_generation.py` - Core HTML generation: `generate_html()`, `generate_batch_html()`, pagination
 - `rendering.py` - Markdown rendering and content block formatting (tool results, code blocks, etc.)
 - `parsing.py` - Session file parsing (JSON/JSONL), text extraction
 - `discovery.py` - Finding sessions in `~/.claude/projects`
 - `analysis.py` - Conversation statistics, commit detection, GitHub repo detection
-- `api.py` - Anthropic API client for web sessions
 - `gist.py` - GitHub Gist creation via `gh` CLI
 - `models.py` - Data classes (`ConversationStats`)
 
