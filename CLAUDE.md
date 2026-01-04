@@ -10,12 +10,6 @@ uv run pytest
 
 # Run a single test
 uv run pytest tests/test_generate_html.py::TestClassName::test_method_name -v
-
-# Run the development version of the CLI
-uv run claude-code-transcripts --help
-
-# Format code before committing
-uv run black .
 ```
 
 ## Development Practices
@@ -30,7 +24,7 @@ The package converts Claude Code session files (JSON/JSONL) to paginated HTML tr
 
 ### Module Structure
 
-- `__init__.py` - CLI commands (local, json, all) using Click, plus public API re-exports
+- `__init__.py` - Package initialization, public API re-exports
 - `html_generation.py` - Core HTML generation: `generate_html()`, `generate_batch_html()`, pagination
 - `rendering.py` - Markdown rendering and content block formatting (tool results, code blocks, etc.)
 - `parsing.py` - Session file parsing (JSON/JSONL), text extraction

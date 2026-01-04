@@ -17,161 +17,30 @@ Install this tool using `uv`:
 ```bash
 uv tool install claude-code-transcripts
 ```
-Or run it without installing:
-```bash
-uvx claude-code-transcripts --help
-```
 
-## Usage
+## Library Usage
 
-This tool converts Claude Code session files into browseable multi-page HTML transcripts.
+This package provides functions for working with Claude Code session files:
 
-There are three commands available:
+```python
+from claude_code_transcripts import (
+    parse_session_file,
+    generate_html,
+    find_all_sessions,
+    find_local_sessions,
+)
 
-- `local` (default) - select from local Claude Code sessions stored in `~/.claude/projects`
-- `json` - convert a specific JSON or JSONL session file
-- `all` - convert all local sessions to a browsable HTML archive
+# Parse a session file (JSON or JSONL)
+session_data = parse_session_file("session.jsonl")
 
-The quickest way to view a recent local session:
+# Generate HTML output
+generate_html("session.jsonl", output_dir="./output")
 
-```bash
-claude-code-transcripts
-```
+# Find all local sessions grouped by project
+projects = find_all_sessions()  # Uses ~/.claude/projects by default
 
-This shows an interactive picker to select a session, generates HTML, and opens it in your default browser.
-
-### Output options
-
-All commands support these options:
-
-- `-o, --output DIRECTORY` - output directory (default: writes to temp dir and opens browser)
-- `-a, --output-auto` - auto-name output subdirectory based on session ID or filename
-- `--repo OWNER/NAME` - GitHub repo for commit links (auto-detected from git push output if not specified)
-- `--open` - open the generated `index.html` in your default browser (default if no `-o` specified)
-- `--gist` - upload the generated HTML files to a GitHub Gist and output a preview URL
-- `--json` - include the original session file in the output directory
-
-The generated output includes:
-- `index.html` - an index page with a timeline of prompts and commits
-- `page-001.html`, `page-002.html`, etc. - paginated transcript pages
-
-### Local sessions
-
-Local Claude Code sessions are stored as JSONL files in `~/.claude/projects`. Run with no arguments to select from recent sessions:
-
-```bash
-claude-code-transcripts
-# or explicitly:
-claude-code-transcripts local
-```
-
-Use `--limit` to control how many sessions are shown (default: 10):
-
-```bash
-claude-code-transcripts local --limit 20
-```
-
-### Publishing to GitHub Gist
-
-Use the `--gist` option to automatically upload your transcript to a GitHub Gist and get a shareable preview URL:
-
-```bash
-claude-code-transcripts --gist
-claude-code-transcripts json session.json --gist
-```
-
-This will output something like:
-```
-Gist: https://gist.github.com/username/abc123def456
-Preview: https://gisthost.github.io/?abc123def456/index.html
-Files: /var/folders/.../session-id
-```
-
-The preview URL uses [gisthost.github.io](https://gisthost.github.io/) to render your HTML gist. The tool automatically injects JavaScript to fix relative links when served through gisthost.
-
-Combine with `-o` to keep a local copy:
-
-```bash
-claude-code-transcripts json session.json -o ./my-transcript --gist
-```
-
-**Requirements:** The `--gist` option requires the [GitHub CLI](https://cli.github.com/) (`gh`) to be installed and authenticated (`gh auth login`).
-
-### Auto-naming output directories
-
-Use `-a/--output-auto` to automatically create a subdirectory named after the session:
-
-```bash
-# Creates ./my-session/ subdirectory
-claude-code-transcripts json my-session.jsonl -a
-
-# Creates ./transcripts/my-session/ subdirectory
-claude-code-transcripts json my-session.jsonl -o ./transcripts -a
-```
-
-### Including the source file
-
-Use the `--json` option to include the original session file in the output directory:
-
-```bash
-claude-code-transcripts json session.json -o ./my-transcript --json
-```
-
-This will output:
-```
-JSON: ./my-transcript/session_ABC.json (245.3 KB)
-```
-
-This is useful for archiving the source data alongside the HTML output.
-
-### Converting from JSON/JSONL files
-
-Convert a specific session file directly:
-
-```bash
-claude-code-transcripts json session.json -o output-directory/
-claude-code-transcripts json session.jsonl --open
-```
-This works with JSONL files in the `~/.claude/projects/` folder.
-
-The `json` command can take a URL to a JSON or JSONL file as an alternative to a path on disk.
-
-### Converting all sessions
-
-Convert all your local Claude Code sessions to a browsable HTML archive:
-
-```bash
-claude-code-transcripts all
-```
-
-This creates a directory structure with:
-- A master index listing all projects
-- Per-project pages listing sessions
-- Individual session transcripts
-
-Options:
-
-- `-s, --source DIRECTORY` - source directory (default: `~/.claude/projects`)
-- `-o, --output DIRECTORY` - output directory (default: `./claude-archive`)
-- `--include-agents` - include agent session files (excluded by default)
-- `--dry-run` - show what would be converted without creating files
-- `--open` - open the generated archive in your default browser
-- `-q, --quiet` - suppress all output except errors
-
-Examples:
-
-```bash
-# Preview what would be converted
-claude-code-transcripts all --dry-run
-
-# Convert all sessions and open in browser
-claude-code-transcripts all --open
-
-# Convert to a specific directory
-claude-code-transcripts all -o ./my-archive
-
-# Include agent sessions
-claude-code-transcripts all --include-agents
+# Find recent local sessions
+sessions = find_local_sessions(limit=10)
 ```
 
 ## Development
@@ -180,8 +49,4 @@ To contribute to this tool, first checkout the code. You can run the tests using
 ```bash
 cd claude-code-transcripts
 uv run pytest
-```
-And run your local development copy of the tool like this:
-```bash
-uv run claude-code-transcripts --help
 ```
