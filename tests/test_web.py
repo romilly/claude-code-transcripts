@@ -134,3 +134,37 @@ class TestSessionsPage:
         """Test that nonexistent project returns 404."""
         response = client.get("/project/nonexistent")
         assert response.status_code == 404
+
+
+class TestSessionViewer:
+    """Tests for the session viewer page."""
+
+    def test_session_page_returns_html(self, client):
+        """Test that session page returns HTML."""
+        response = client.get("/session/project-a/abc123")
+        assert response.status_code == 200
+        assert "text/html" in response.headers["content-type"]
+
+    def test_session_page_shows_conversation(self, client):
+        """Test that session page shows conversation messages."""
+        response = client.get("/session/project-a/abc123")
+        # User message should appear
+        assert "Hello from project A" in response.text
+        # Assistant response should appear
+        assert "Hi there!" in response.text
+
+    def test_session_page_has_breadcrumb(self, client):
+        """Test that session page has breadcrumb navigation."""
+        response = client.get("/session/project-a/abc123")
+        assert 'href="/"' in response.text  # Link to home
+        assert 'href="/project/project-a"' in response.text  # Link to project
+
+    def test_nonexistent_session_returns_404(self, client):
+        """Test that nonexistent session returns 404."""
+        response = client.get("/session/project-a/nonexistent")
+        assert response.status_code == 404
+
+    def test_nonexistent_project_in_session_returns_404(self, client):
+        """Test that nonexistent project in session URL returns 404."""
+        response = client.get("/session/nonexistent/abc123")
+        assert response.status_code == 404

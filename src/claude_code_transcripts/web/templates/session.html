@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{{ session.path.stem }} - {{ project.name }} - Claude Code Transcripts{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="/">Projects</a> &raquo; <a href="/project/{{ project.name }}">{{ project.name }}</a> &raquo; {{ session.path.stem }}
+</div>
+
+<h1>{{ session.path.stem }}</h1>
+
+<style>
+    .message {
+        margin-bottom: 20px;
+        padding: 16px;
+        border-radius: 8px;
+    }
+    .message.user {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+    }
+    .message.assistant {
+        background: #f5f5f5;
+        border-left: 4px solid #9e9e9e;
+    }
+    .message pre {
+        background: #263238;
+        color: #aed581;
+        padding: 12px;
+        border-radius: 4px;
+        overflow-x: auto;
+        font-size: 13px;
+    }
+    .message code {
+        background: #e0e0e0;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+    .message pre code {
+        background: none;
+        padding: 0;
+    }
+</style>
+
+{% for message in messages %}
+<div class="message {{ message.type }}">
+    {{ message.html }}
+</div>
+{% endfor %}
+
+{% if not messages %}
+<p>No messages in this session.</p>
+{% endif %}
+{% endblock %}
