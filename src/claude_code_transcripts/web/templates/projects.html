@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Projects - Claude Code Transcripts{% endblock %}
+
+{% block content %}
+<h1>Claude Code Projects</h1>
+
+{% if projects %}
+    {% for project in projects %}
+    <div class="card">
+        <h2><a href="/project/{{ project.name }}">{{ project.name }}</a></h2>
+        <div class="meta">
+            {{ project.sessions|length }} session{% if project.sessions|length != 1 %}s{% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No projects found in {{ projects_dir }}</p>
+{% endif %}
+{% endblock %}
