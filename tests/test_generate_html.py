@@ -286,11 +286,11 @@ class TestRenderContentBlock:
 
     def test_tool_result_with_commit(self, snapshot_html):
         """Test tool result with git commit output."""
-        # Need to set the global _github_repo for commit link rendering
-        import claude_code_transcripts
+        # Need to set the github_repo for commit link rendering
+        from claude_code_transcripts import rendering
 
-        old_repo = claude_code_transcripts._github_repo
-        claude_code_transcripts._github_repo = "example/repo"
+        old_repo = rendering.get_github_repo()
+        rendering.set_github_repo("example/repo")
         try:
             block = {
                 "type": "tool_result",
@@ -300,7 +300,7 @@ class TestRenderContentBlock:
             result = render_content_block(block)
             assert result == snapshot_html
         finally:
-            claude_code_transcripts._github_repo = old_repo
+            rendering.set_github_repo(old_repo)
 
 
 class TestAnalyzeConversation:
@@ -339,8 +339,8 @@ class TestAnalyzeConversation:
             ),
         ]
         result = analyze_conversation(messages)
-        assert result["tool_counts"]["Bash"] == 2
-        assert result["tool_counts"]["Write"] == 1
+        assert result.tool_counts["Bash"] == 2
+        assert result.tool_counts["Write"] == 1
 
     def test_extracts_commits(self):
         """Test that git commits are extracted."""
@@ -361,9 +361,9 @@ class TestAnalyzeConversation:
             ),
         ]
         result = analyze_conversation(messages)
-        assert len(result["commits"]) == 1
-        assert result["commits"][0][0] == "abc1234"
-        assert "Add new feature" in result["commits"][0][1]
+        assert len(result.commits) == 1
+        assert result.commits[0][0] == "abc1234"
+        assert "Add new feature" in result.commits[0][1]
 
 
 class TestFormatToolStats:

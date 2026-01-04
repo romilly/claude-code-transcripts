@@ -279,7 +279,9 @@ class TestGenerateBatchHtml:
             )
 
             # Patch generate_html to fail on one specific session
-            original_generate_html = __import__("claude_code_transcripts").generate_html
+            # Must patch in html_generation where generate_batch_html calls it
+            from claude_code_transcripts import html_generation
+            original_generate_html = html_generation.generate_html
 
             def mock_generate_html(json_path, output_dir, github_repo=None):
                 if "session1" in str(json_path):
@@ -287,7 +289,7 @@ class TestGenerateBatchHtml:
                 return original_generate_html(json_path, output_dir, github_repo)
 
             with patch(
-                "claude_code_transcripts.generate_html", side_effect=mock_generate_html
+                "claude_code_transcripts.html_generation.generate_html", side_effect=mock_generate_html
             ):
                 stats = generate_batch_html(projects_dir, output_dir)
 
