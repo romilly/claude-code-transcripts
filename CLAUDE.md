@@ -10,6 +10,12 @@ uv run pytest
 
 # Run a single test
 uv run pytest tests/test_generate_html.py::TestClassName::test_method_name -v
+
+# Start the web server
+uv run claude-code-transcripts serve
+
+# Start with auto-reload for development
+uv run claude-code-transcripts serve --reload
 ```
 
 ## Development Practices

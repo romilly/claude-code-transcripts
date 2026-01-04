@@ -79,5 +79,38 @@ def cli():
     pass
 
 
+@cli.command()
+@click.option("--host", default="127.0.0.1", help="Host to bind to")
+@click.option("--port", default=8000, help="Port to bind to")
+@click.option("--reload", is_flag=True, help="Enable auto-reload for development")
+@click.option(
+    "--projects-dir",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    default=None,
+    help="Path to Claude projects directory (default: ~/.claude/projects)",
+)
+def serve(host: str, port: int, reload: bool, projects_dir: Path | None):
+    """Start the web server to browse transcripts."""
+    import uvicorn
+    from .web import create_app
+
+    if projects_dir is None:
+        projects_dir = Path.home() / ".claude" / "projects"
+
+    click.echo(f"Starting server at http://{host}:{port}")
+    click.echo(f"Projects directory: {projects_dir}")
+
+    # Create the app
+    app = create_app(projects_dir=projects_dir)
+
+    # Run with uvicorn
+    uvicorn.run(
+        app,
+        host=host,
+        port=port,
+        reload=reload,
+    )
+
+
 def main():
     cli()

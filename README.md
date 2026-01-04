@@ -5,7 +5,7 @@
 [![Tests](https://github.com/simonw/claude-code-transcripts/workflows/Test/badge.svg)](https://github.com/simonw/claude-code-transcripts/actions?query=workflow%3ATest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/simonw/claude-code-transcripts/blob/main/LICENSE)
 
-Convert Claude Code session files (JSON or JSONL) to clean, mobile-friendly HTML pages with pagination.
+Browse and search Claude Code session transcripts via a web interface.
 
 [Example transcript](https://static.simonwillison.net/static/2025/claude-code-microjs/index.html) produced using this tool.
 
@@ -18,9 +18,35 @@ Install this tool using `uv`:
 uv tool install claude-code-transcripts
 ```
 
+## Usage
+
+Start the web server to browse your Claude Code transcripts:
+
+```bash
+claude-code-transcripts serve
+```
+
+This starts a local web server at http://127.0.0.1:8000 where you can:
+- View all your Claude Code projects
+- Browse sessions within each project
+- Read full conversation transcripts
+
+### Options
+
+```bash
+claude-code-transcripts serve --help
+
+Options:
+  --host TEXT               Host to bind to (default: 127.0.0.1)
+  --port INTEGER            Port to bind to (default: 8000)
+  --reload                  Enable auto-reload for development
+  --projects-dir DIRECTORY  Path to Claude projects directory
+                           (default: ~/.claude/projects)
+```
+
 ## Library Usage
 
-This package provides functions for working with Claude Code session files:
+This package also provides functions for working with Claude Code session files programmatically:
 
 ```python
 from claude_code_transcripts import (

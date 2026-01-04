@@ -168,3 +168,22 @@ class TestSessionViewer:
         """Test that nonexistent project in session URL returns 404."""
         response = client.get("/session/nonexistent/abc123")
         assert response.status_code == 404
+
+
+class TestServeCommand:
+    """Tests for the serve CLI command."""
+
+    def test_serve_command_exists(self):
+        """Test that serve command is registered."""
+        from click.testing import CliRunner
+        from claude_code_transcripts import cli
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["serve", "--help"])
+
+        assert result.exit_code == 0
+        assert "Start the web server" in result.output
+        assert "--host" in result.output
+        assert "--port" in result.output
+        assert "--reload" in result.output
+        assert "--projects-dir" in result.output
