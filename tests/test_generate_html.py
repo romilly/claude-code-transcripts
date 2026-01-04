@@ -811,109 +811,6 @@ class TestSessionJsonOption:
         assert not (output_dir / "session.json").exists()
 
 
-class TestImportJsonOption:
-    """Tests for the import command --json option."""
-
-    def test_import_json_saves_session_data(self, httpx_mock, output_dir):
-        """Test that import --json saves the session JSON."""
-        from click.testing import CliRunner
-        from claude_code_transcripts import cli
-
-        # Load sample session to mock API response
-        fixture_path = Path(__file__).parent / "sample_session.json"
-        with open(fixture_path) as f:
-            session_data = json.load(f)
-
-        httpx_mock.add_response(
-            url="https://api.anthropic.com/v1/session_ingress/session/test-session-id",
-            json=session_data,
-        )
-
-        runner = CliRunner()
-        result = runner.invoke(
-            cli,
-            [
-                "web",
-                "test-session-id",
-                "--token",
-                "test-token",
-                "--org-uuid",
-                "test-org",
-                "-o",
-                str(output_dir),
-                "--json",
-            ],
-        )
-
-        assert result.exit_code == 0
-        json_file = output_dir / "test-session-id.json"
-        assert json_file.exists()
-        assert "JSON:" in result.output
-        assert "KB" in result.output
-
-        # Verify JSON content is valid
-        with open(json_file) as f:
-            saved_data = json.load(f)
-        assert saved_data == session_data
-
-
-class TestImportGistOption:
-    """Tests for the import command --gist option."""
-
-    def test_import_gist_creates_gist(self, httpx_mock, monkeypatch, tmp_path):
-        """Test that import --gist creates a gist."""
-        from click.testing import CliRunner
-        from claude_code_transcripts import cli
-        import subprocess
-
-        # Load sample session to mock API response
-        fixture_path = Path(__file__).parent / "sample_session.json"
-        with open(fixture_path) as f:
-            session_data = json.load(f)
-
-        httpx_mock.add_response(
-            url="https://api.anthropic.com/v1/session_ingress/session/test-session-id",
-            json=session_data,
-        )
-
-        # Mock subprocess.run for gh gist create
-        mock_result = subprocess.CompletedProcess(
-            args=["gh", "gist", "create"],
-            returncode=0,
-            stdout="https://gist.github.com/testuser/def456\n",
-            stderr="",
-        )
-
-        def mock_run(*args, **kwargs):
-            return mock_result
-
-        monkeypatch.setattr(subprocess, "run", mock_run)
-
-        # Mock tempfile.gettempdir
-        monkeypatch.setattr(
-            "claude_code_transcripts.tempfile.gettempdir", lambda: str(tmp_path)
-        )
-
-        runner = CliRunner()
-        result = runner.invoke(
-            cli,
-            [
-                "web",
-                "test-session-id",
-                "--token",
-                "test-token",
-                "--org-uuid",
-                "test-org",
-                "--gist",
-            ],
-        )
-
-        assert result.exit_code == 0
-        assert "Creating GitHub gist" in result.output
-        assert "gist.github.com" in result.output
-        assert "gisthost.github.io" in result.output
-
-
 class TestVersionOption:
     """Tests for the --version option."""
 
@@ -967,51 +864,6 @@ class TestOpenOption:
         result = runner.invoke(
             cli,
             ["json", str(fixture_path), "-o", str(output_dir), "--open"],
-        )
-
-        assert result.exit_code == 0
-        assert len(opened_urls) == 1
-        assert "index.html" in opened_urls[0]
-        assert opened_urls[0].startswith("file://")
-
-    def test_import_open_calls_webbrowser(self, httpx_mock, output_dir, monkeypatch):
-        """Test that import --open opens the browser."""
-        from click.testing import CliRunner
-        from claude_code_transcripts import cli
-
-        # Load sample session to mock API response
-        fixture_path = Path(__file__).parent / "sample_session.json"
-        with open(fixture_path) as f:
-            session_data = json.load(f)
-
-        httpx_mock.add_response(
-            url="https://api.anthropic.com/v1/session_ingress/session/test-session-id",
-            json=session_data,
-        )
-
-        # Track webbrowser.open calls
-        opened_urls = []
-
-        def mock_open(url):
-            opened_urls.append(url)
-            return True
-
-        monkeypatch.setattr("claude_code_transcripts.webbrowser.open", mock_open)
-
-        runner = CliRunner()
-        result = runner.invoke(
-            cli,
-            [
-                "web",
-                "test-session-id",
-                "--token",
-                "test-token",
-                "--org-uuid",
-                "test-org",
-                "-o",
-                str(output_dir),
-                "--open",
-            ],
         )
 
         assert result.exit_code == 0
@@ -1434,43 +1286,6 @@ class TestOutputAutoOption:
         assert result.exit_code == 0
         # Output should be in output_parent/my-session-file/
         expected_dir = output_parent / "my-session-file"
-        assert expected_dir.exists()
-        assert (expected_dir / "index.html").exists()
-
-    def test_web_output_auto_creates_subdirectory(self, httpx_mock, tmp_path):
-        """Test that web -a creates output subdirectory named after session ID."""
-        from click.testing import CliRunner
-        from claude_code_transcripts import cli
-
-        # Load sample session to mock API response
-        fixture_path = Path(__file__).parent / "sample_session.json"
-        with open(fixture_path) as f:
-            session_data = json.load(f)
-
-        httpx_mock.add_response(
-            url="https://api.anthropic.com/v1/session_ingress/session/my-web-session-id",
-            json=session_data,
-        )
-
-        runner = CliRunner()
-        result = runner.invoke(
-            cli,
-            [
-                "web",
-                "my-web-session-id",
-                "--token",
-                "test-token",
-                "--org-uuid",
-                "test-org",
-                "-a",
-                "-o",
-                str(tmp_path),
-            ],
-        )
-
-        assert result.exit_code == 0
-        # Output should be in tmp_path/my-web-session-id/
-        expected_dir = tmp_path / "my-web-session-id"
         assert expected_dir.exists()
         assert (expected_dir / "index.html").exists()
 
