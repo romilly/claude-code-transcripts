@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - Claude Code Transcripts{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="/">Projects</a> &raquo; {{ project.name }}
+</div>
+
+<h1>{{ project.name }}</h1>
+
+{% if project.sessions %}
+    {% for session in project.sessions %}
+    <div class="card">
+        <h2><a href="/session/{{ project.name }}/{{ session.path.stem }}">{{ session.path.stem }}</a></h2>
+        <div class="session-summary">{{ session.summary }}</div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No sessions found in this project.</p>
+{% endif %}
+{% endblock %}

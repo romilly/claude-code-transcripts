@@ -91,3 +91,46 @@ class TestEmptyProjectsDir:
             response = client.get("/")
             assert response.status_code == 200
             assert "No projects found" in response.text
+
+
+class TestSessionsPage:
+    """Tests for the sessions listing page."""
+
+    def test_project_page_returns_html(self, client):
+        """Test that project page returns HTML."""
+        response = client.get("/project/project-a")
+        assert response.status_code == 200
+        assert "text/html" in response.headers["content-type"]
+
+    def test_project_page_shows_project_name(self, client):
+        """Test that project page shows the project name."""
+        response = client.get("/project/project-a")
+        assert "project-a" in response.text
+
+    def test_project_page_lists_sessions(self, client):
+        """Test that project page lists all sessions."""
+        response = client.get("/project/project-a")
+        # Should contain session IDs
+        assert "abc123" in response.text
+        assert "def456" in response.text
+
+    def test_project_page_shows_session_summaries(self, client):
+        """Test that project page shows session summaries."""
+        response = client.get("/project/project-a")
+        # First user message becomes the summary
+        assert "Hello from project A" in response.text
+
+    def test_project_page_has_session_links(self, client):
+        """Test that sessions are clickable links."""
+        response = client.get("/project/project-a")
+        assert 'href="/session/project-a/abc123"' in response.text
+
+    def test_project_page_has_back_link(self, client):
+        """Test that project page has a link back to projects list."""
+        response = client.get("/project/project-a")
+        assert 'href="/"' in response.text
+
+    def test_nonexistent_project_returns_404(self, client):
+        """Test that nonexistent project returns 404."""
+        response = client.get("/project/nonexistent")
+        assert response.status_code == 404
